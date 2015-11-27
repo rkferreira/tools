@@ -1,0 +1,40 @@
+### match_network_acl ###
+
+ Finds network acls (like cisco) for IP or RANGE.
+ It's usefull when you have huge acl list and you can check if specific IP, IPs or a RANGE match some line.
+
+Usage: match_network_acl.py [options]
+
+Options:
+  -h, --help            show this help message and exit
+  -i IPADDR, --ip=IPADDR
+                        find exactly this ip address (eg.: 10.1.1.1)
+  -r NETRANGE, --range=NETRANGE
+                        find a line that matchs the range (eg.: 10.1.1.0/24)
+  -a ALLIPS, --allips=ALLIPS
+                        find all ips from a range line (eg.: 10.1.1.0/24)
+  -f FILE, --file=FILE  file name/path where are the rules)
+  -v VLAN, --vlan=VLAN  saying this I'm going to guess the file. Yes, I know
+                        how todo magic!
+  -d, --download        download acl files, must be called alone. Just
+                        --prefix and --abspath are supported for that
+  --prefixdir=PREFIXDIR
+                        prefix for opening or downloadin files
+  --abspath=ABSPATH     absolute path for opening or downloading files
+  -?                    detailed help. -h/--help also work
+
+## Extended help:
+$ ./match_network_acl.py -?
+
+-i/--ip   	--> find exactly this ip address. input format eg.: 10.1.1.1
+-r/--range  	--> find a line that matchs the range. input format eg.: 10.1.1.0/24 
+		It will find for 10.1.1.0 0.0.0.255
+-a/--allips 	--> find all ips from a range line. input format eg.: 10.1.1.0/30 
+ 		It will find for 10.1.1.1 and 10.1.1.2
+-f/--file   	--> file name/path 
+
+-v/--vlan   	--> I'll guest the file name based on vlan number. input format eg.: DC01-BK-2559-OUT 
+		It will find for vlan 2559 in datacenter rules DC01 and it is backnet BK
+-d/--download 	--> I'll download acl files from site, so I can parse later. You must have ~/.wgetrc configured correctly 
+
+
