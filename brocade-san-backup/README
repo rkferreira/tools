@@ -1,0 +1,4 @@
+#
+# It backups BROCADE SAN SWITCH configurations to an FTP
+# It must run on a linux cron and you must have SSH access to switch and a destination FTP to store those backups
+#
