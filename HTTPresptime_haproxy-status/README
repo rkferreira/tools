@@ -1,0 +1,4 @@
+##
+# Check HAPROXY down servers, HTTP response time and expected response string.
+# Writes results on a txt file, after it's read by SNMP agent.
+##
