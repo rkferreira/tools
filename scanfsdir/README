@@ -1,0 +1,10 @@
+#
+# Scan specified path for finding directories.
+# Default is depth == 3
+# If no path is informed, it assumes current dir.
+#
+# make scanfsdir
+# ./scanfsdir /tmp/
+# ./scanfsdir
+#
+# 
