@@ -1,0 +1,9 @@
+## getDnsDiffs ##
+#
+# It queries local DNS server versus Google 8.8.8.8 and compare answers.
+# Just to check if there are inconsistencies on local database X internet.
+# Get local DNS domains list from EfficientIP server.
+#
+# Schedule as crontab:    >/tmp/getDnsDiffs.txt && /usr/local/bin/getDnsDiffs.py >> /tmp/getDnsDiffs.txt
+#
+#
