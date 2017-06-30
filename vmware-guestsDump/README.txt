@@ -21,3 +21,7 @@ NAME,STATE,GUESTID,CPUS,MEMSIZE_MB,NUMVDKS,TOTALVDKSSIZE_MB,RPOOL
 fin-vm01,poweredOn,win2000ServGuest,1,512,1,34736.5322265625,Financial
 ldap01,poweredOn,rhel5Guest,1,512,1,10240,Infrastructure
 ActiveDirectory01,poweredOn,win2000ServGuest,1,512,1,10240,Windows Infrastructure
+
+
+
+*** Added vmInventoryList.pl, same base as above. But more fields and options.
