@@ -16,3 +16,13 @@
 # python removeDnsZones.py >> results.txt
 #
 #
+
+
+#### eip.py ####
+##
+# Complete EIP add,remove,check RR operations.
+# **Still working
+# 
+# 
+#
+#
