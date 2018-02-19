@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/bin/python -m pyinotify -e IN_CLOSE_WRITE <SAMPLEDIR> -f -c '/usr/bin/ls -lat <SAMPLEDIR>file* | /usr/bin/mail -s "<SAMPLEDIR> files modification" sample@foo.com'

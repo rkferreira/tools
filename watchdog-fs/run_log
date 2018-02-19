@@ -1,0 +1,2 @@
+#!/bin/sh
+exec multilog t n10 s1048576 /var/log/sample
