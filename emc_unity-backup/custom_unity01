@@ -1,0 +1,5 @@
+UNITY01_HOST='unity01.foo.com'
+UNITY01_USER='service'
+UNITY01_SVC_PASS='servicepass'
+UNITY01_BKP_DIR='/var/unity01/backup/'
+UNITY01_LOG='/var/log/unity01-bkp.log'
