@@ -1,0 +1,134 @@
+import boto3
+import botocore
+import fcntl
+import json
+import re
+import socket
+import struct
+import sys
+import time
+from datetime import datetime
+from optparse import OptionParser
+
+
+ZONE_ID         = 'xxxxxxxxxxx'
+
+DEF_DOMAIN      = ".xxxxxx.com"
+REGION          = "us-east-1"
+TTL             = 600
+RTYPE           = "CNAME"
+COMMENT         = "XXXX auto registration"
+LOG_PREFIX      = "[dnsmgmt] "
+
+client          = boto3.client('route53')
+t1              = datetime.now().strftime("%c")
+
+def delete_record(entry, ip, reg=REGION, t=RTYPE, ttl=TTL, comment=COMMENT):
+    
+    print "%s Starting deletion process %s %s" % (LOG_PREFIX, entry, ip)
+    name = entry
+    try:
+        response = client.change_resource_record_sets(
+            HostedZoneId=ZONE_ID,
+                ChangeBatch={
+                    'Changes': [
+                        {
+                            'Action': 'DELETE',
+                            'ResourceRecordSet': {
+                                'Name': name,
+                                'Region': reg,
+                                'Type': t,
+                                'TTL': ttl,
+                                'SetIdentifier': comment,
+                                'ResourceRecords': [
+                                    {
+                                        'Value': ip
+                                    }
+                                ],
+                            }
+                        }
+                    ]
+                }
+        )
+        
+    except:
+        print "%s Error creating entry %s" % (LOG_PREFIX,name)
+
+    s = response['ChangeInfo']['Status']
+    i = response['ChangeInfo']['Id']
+    
+    while s == 'PENDING':
+                s = get_change_status(i)
+                time.sleep(10)
+                
+    return response
+
+        
+def get_change_status(reqid):
+        response = client.get_change(
+                Id=reqid
+        )
+        #response = client.get_change_details(Id=reqid)
+        return response['ChangeInfo']['Status']
+    
+
+def list_rr(entry=None, t=None, ALL=0):
+        if ALL == 0:
+                response = client.list_resource_record_sets(
+                        HostedZoneId=ZONE_ID,
+                        StartRecordName=entry,
+                        StartRecordType=t
+                )
+        else:
+                response = client.list_resource_record_sets(
+                        HostedZoneId=ZONE_ID
+                )
+
+        rr_entries = ''
+        
+        for k,v in response.iteritems():
+                if k == 'ResourceRecordSets':
+                        a =  response[k][0]
+                        rr_entries = rr_entries + a['Name'] + ' '
+                        rr_entries = rr_entries + a['Type'] + ' '
+                        for b in a['ResourceRecords']:
+                                rr_entries = rr_entries + b['Value'] + '\n'
+
+        return rr_entries
+        
+def lambda_handler(event, context):
+    
+    h = event['detail']['instance-id']
+    
+    tmp = list_rr(h+DEF_DOMAIN,"CNAME"); print "%s" % (tmp)
+    list_names = tmp.split(" ")
+    dns_name01 = list_names[0]
+    dns_name02 = list_names[2].strip("\n")
+    print "DNS_NAME01"
+    print dns_name01
+    print "DNS_NAME02"
+    print dns_name02
+    
+    
+    if dns_name01:
+        print "got dnsname01, going to get dyndns"
+        while True:
+            try:
+                dyndns = socket.gethostbyaddr(dns_name01)[0]
+                break
+            except:
+                pass
+  
+    if h == dns_name01.split(".")[0]:
+        if dns_name02 and dns_name01:
+            # deleting record 01
+            print "got dnsname02 and dnsname01 going to delete"
+            delete_record(dns_name01,dns_name02)
+    
+        if dns_name02 and dyndns:
+            # deleting record 02
+            print "got dnsname02 and dyndns going to delete"
+            delete_record(dns_name02,dyndns)
+    
+    return dns_name01,dns_name02,dyndns
+    
