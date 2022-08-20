@@ -1,0 +1,42 @@
+on:
+  pull_request_target:
+    branches:
+      - main
+    paths:
+      - 'accounts/**/msk-secrets/*.tfvars'
+  workflow_dispatch:
+
+name: Check Users Consistency
+
+env:
+  basePath: "basedir/"
+
+jobs:
+  fileFormat:
+    name: terraform.tfvars file format check
+    runs-on: ["my-runner"]
+    strategy:
+      matrix:
+        accounts: [dev, hml, prd]
+        legacy:
+          - legacy.auto.tfvars
+        main: 
+          - terraform.tfvars
+    steps:
+      - uses: actions/checkout@v3
+        if: ${{ github.event_name == 'pull_request_target' }}
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Remove file Header
+        run: |
+          shopt -s globstar
+          sed -i '1,4d' ${{ env.basePath }}${{ matrix.accounts }}/**/${{ matrix.main }}
+          sed -i '1,4d' ${{ env.basePath }}${{ matrix.accounts }}/**/${{ matrix.legacy }}
+      - name: Run file format checker
+        run: |
+          shopt -s globstar
+          ./.github/scripts/fileFormat.awk ${{ env.basePath }}${{ matrix.accounts }}/**/${{ matrix.main }}
+      - name: Run check duplicated users
+        run: |
+          shopt -s globstar
+          ./.github/scripts/avoidDuplicates.awk ${{ env.basePath }}${{ matrix.accounts }}/**/${{ matrix.main }} ${{ env.basePath }}${{ matrix.accounts }}/**/${{ matrix.legacy }}
